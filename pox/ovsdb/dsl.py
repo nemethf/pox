@@ -283,7 +283,8 @@ class Update (Operation):
 
     table = data.pop(0)
     where = []
-    if expect(data, WHERE, optional=True):
+    if data[0] is WHERE:
+      del data[0]
       where = parse_conditions(data)
 
     expect(data, WITH)
