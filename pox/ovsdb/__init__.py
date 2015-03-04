@@ -668,11 +668,19 @@ class ClientWorker (RecocoIOWorker):
     self.addr = addr
     self.port = port
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if (port < 0): #HACK: Negative number selects unix socket.
+      unix_socket = '/var/run/openvswitch/db.sock'
+      s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+      self._debug("Attempting to connect to %s", unix_socket)
+      s.setblocking(0)
+      r = s.connect_ex(unix_socket)
+    else:
+      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      self._debug("Attempting to connect to %s:%s", self.addr, self.port)
+      s.setblocking(0)
+      r = s.connect_ex((str(self.addr), self.port))
     self.socket = s
-    s.setblocking(0)
-    self._debug("Attempting to connect to %s:%s", self.addr, self.port)
-    r = s.connect_ex((str(self.addr), self.port))
+
     if r in (0, errno.EINPROGRESS, errno.EAGAIN, 10035): # 10035=WSAEWOULDBLOCK
       # We either connected or connection is in progress
       pass
