@@ -104,7 +104,12 @@ class Operation (object):
   Superclass for OVSDB operations
   """
   def _format__json (self):
-    return {k:v for k,v in vars(self).items() if v is not NO_VALUE}
+    def convert (variable):
+      if variable == 'uuid_name':
+        return 'uuid-name'
+      return variable
+  
+    return {convert(k):v for k,v in vars(self).items() if v is not NO_VALUE}
 
   def __str__ (self):
     return pox.ovsdb.to_raw_json(self._format__json())
