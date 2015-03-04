@@ -139,7 +139,7 @@ class Insert (Operation):
       expect(els, UUID_NAME)
       uuid_name = els.pop(0)
     else:
-      uuid_name = None
+      uuid_name = NO_VALUE
 
     return cls(table, row, uuid_name)
 
